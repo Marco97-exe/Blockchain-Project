@@ -3,7 +3,9 @@ import {ethers} from 'ethers';
 
 import {contractABI, contractAddress} from '../utils/constants';
 
-export const PrenotationContext = React.createContext();
+const PrenotationContext = React.createContext();
+
+export default PrenotationContext;
 
 const {ethereum} = window;
 
@@ -18,13 +20,16 @@ const getEthereumContract = () => {
 export const PrenotationProvider = ({children}) => {
 
     const [currentAccount, setCurrentAccount] = useState("");
-    const [formData, setFormData] = useState({addressTo: "", amount:"", keyword:"", message:"" });
+    const [formData, setFormData] = useState({addressTo: "", amount:"", keyword:"", description:"" });
+    const [isLoading, setIsLoading] = useState(false);
+
+
+
     const handleChange = (e, name) => {
         setFormData((prevState) => ({...prevState, [name]: e.target.value}));
     };
 
     const checkIfWalletConnected = async () => {
-
         try {
             if(!ethereum) return alert("Please install MetaMask");
 
@@ -33,7 +38,7 @@ export const PrenotationProvider = ({children}) => {
             if(accounts.length){
                 setCurrentAccount(accounts[0]);
 
-                //getAllTransactions();
+                //getAllPrenotation();
             } else{
                 console.log("No accounts found");
             }
@@ -44,11 +49,15 @@ export const PrenotationProvider = ({children}) => {
         
     };
 
-    const sendTransaction = async () => {
+    // Questo metodo dovrebbe essere il rentOutPlace
+    const sendPrenotation = async () => {
         try {
             if(!ethereum) return alert("Please install MetaMask");
-            const {addressTo, amount, keyword, message} = formData;
-            getEthereumContract();
+            const {addressTo, amount, keyword, description} = formData;
+            const prenotationContract = getEthereumContract();
+
+            //send place to blockchain
+
 
 
 
@@ -62,18 +71,17 @@ export const PrenotationProvider = ({children}) => {
         try {
           if (!ethereum) return alert("Please install MetaMask.");
     
-          const accounts = await ethereum.request({ method: "eth_requestAccounts", });
-    
+          const accounts = await ethereum.request({ method: 'eth_requestAccounts', });
+          console.log(accounts)
           setCurrentAccount(accounts[0]);
           window.location.reload();
         } catch (error) {
-          console.log(error);
-    
-          throw new Error("No ethereum object");
+            console.log(error);
+            throw new Error("No ethereum object");
         }
-      };
+    };
 
-    useEffect(()=>{
+    useEffect(() => {
         checkIfWalletConnected();
     },[]);
 
@@ -83,9 +91,9 @@ export const PrenotationProvider = ({children}) => {
             connectWallet,
             currentAccount,
             formData, 
-            sendTransaction, 
+            sendPrenotation, 
             handleChange,}}>
-            {children}
+                {children}
         </PrenotationContext.Provider>
     );
 };
