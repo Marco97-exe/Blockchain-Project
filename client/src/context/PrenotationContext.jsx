@@ -20,6 +20,7 @@ const getEthereumContract = () => {
 export const PrenotationProvider = ({children}) => {
 
     const [currentAccount, setCurrentAccount] = useState("");
+    //TODO: non ho bisogno dell'addressTo ma solo del prezzo a qui lo voglio fittare al giorno, il titolo (keyword) e la description (description)
     const [formData, setFormData] = useState({addressTo: "", amount:"", keyword:"", description:"" });
     const [isLoading, setIsLoading] = useState(false);
 
@@ -48,18 +49,36 @@ export const PrenotationProvider = ({children}) => {
         }
         
     };
-
-    // Questo metodo dovrebbe essere il rentOutPlace
+    //TODO: Sistemare il metodo in modo corretto 
+    // Questo metodo dovrebbe essere l'equivalente di rentOutPlace di Prenotation.sol
     const sendPrenotation = async () => {
         try {
             if(!ethereum) return alert("Please install MetaMask");
             const {addressTo, amount, keyword, description} = formData;
             const prenotationContract = getEthereumContract();
+            const parsedAmount = ethers.utils.parseEthers(amount);
+
 
             //send place to blockchain
+            await ethereum.request({
+                method: 'eth_sendTransaction',
+                params: [{
+                    from: currentAccount,
+                    to: addressTo,
+                    gas: '0x5208', //21000 GWEI
+                    value: parsedAmount._hex, //this need to be transformed in gwei or hexa
+                }]
+            });
 
+            const rentoOutHash = await prenotationContract.rentOutPlace(keyword, description, parsedAmount);
 
-
+            setIsLoading(true);
+            console.log(`Loading - ${rentoOutHash.hash}`);
+            await rentoOutHash.wait();
+            setIsLoading(false);
+            console.log(`Success - ${rentoOutHash.hash}`);
+            
+            
 
         } catch (error) {
             console.log(error);

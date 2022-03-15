@@ -5,6 +5,8 @@ import {BsHandbagFill, BsInfoCircle} from 'react-icons/bs';
 import  PrenotationContext  from '../context/PrenotationContext.jsx';
 import {Loader} from './';
 
+import { shortenAddress } from '../utils/shortenAddress.js';
+
 const commonStyles = 'min-h-[70px] sm:px-0 px-2 sm:min-w-[120px] flex justify-center items-center border-[0.5px] border-gray-400 text-sm font-light text-white';
 
 const Input = ({placeholder, name, type, value, handleChange}) => (
@@ -23,14 +25,12 @@ const Input = ({placeholder, name, type, value, handleChange}) => (
 const Welcome = () => {
     // Transfering data from context/PrenotationContext to components
     const {connectWallet,currentAccount, formData, sendPrenotation, handleChange} = useContext(PrenotationContext);
-    console.log(connectWallet);
-    console.log(currentAccount);
-    console.log(formData);
-    console.log(sendPrenotation);
-    console.log(handleChange);
     
     const handleSubmit = (e) =>{
+        // TODO: Non ho bisogno dell'addressTo perchè il formData raccoglie i dati per effettuare il rentOut di un posto 
         const {addressTo, amount, keyword, description} = formData;
+        
+        //avoids to reload the page
         e.preventDefault();
 
         if(!addressTo || !amount || !keyword || !description) return;
@@ -85,8 +85,8 @@ const Welcome = () => {
                                 <BsInfoCircle fontSize={17} color="#fff"/>
                             </div>
                             <div>
-                                <p className="text-white font-light text-sm">
-                                    Ci andrà l'address
+                                <p className="text-white font-sembibold text-sm">
+                                    {shortenAddress(currentAccount)}
                                 </p>
                                 <p className="text-white font-semibold text-lg mt-1">
                                     Ethereum
@@ -94,7 +94,7 @@ const Welcome = () => {
                             </div>
                         </div>
                     </div>
-
+                    {/* TODO: Devo togliere l'address perchè questo campo serve per effettuare il rentOut di un posto */}
                     <div className="p-5 sm:w-96 w-full flex flex-col justify-start items-center blue-glassmorphism">
                         <Input placeholder="Address To" name="addressTo" type="text" handleChange={handleChange}/>
                         <Input placeholder="Amount (ETH)" name="amount" type="number" handleChange={handleChange}/>
