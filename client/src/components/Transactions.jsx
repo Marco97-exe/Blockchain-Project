@@ -41,27 +41,31 @@ const PlaceCard = ({addressTo, addressFrom, timestamp, message, keyword, amount}
 
 
 const Transactions = () => {
-    const {currentAccount} = useContext(PrenotationContext);
+    const {currentAccount, places} = useContext(PrenotationContext);
+    console.log(currentAccount)
 
 
 
     return (
         <div className="flex w-full justify-center items-center 2xl:px-20 gradient-bg-transactions">
             <div className="flex flex-col md:p-12 py-12 px-4">
-                {currentAccount ? (
+                {currentAccount !== "" ? (
+                  <div>
                     <h3 className="text-white text-3xl text-center my-2 text-gradient">
                         Latest Transactions
                     </h3>
+                    <div className="flex flex-wrap justify-center items-center mt-10">
+                    {places.reverse().map((place,i) => (
+                        <PlaceCard key={i} {...place} />
+                    ))}
+                    </div>
+                  </div>
                 ) : (
                     <h3 className="text-white text-3xl text-center my-2 text-gradient">
                         Connect your account to see the Places
                     </h3>
                 )}
-                <div className="flex flex-wrap justify-center items-center mt-10">
-                    {testData.reverse().map((place,i) => (
-                        <PlaceCard key={i} {...place} />
-                    ))}
-                </div>
+                
             </div>
         </div>
     );

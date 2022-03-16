@@ -24,7 +24,7 @@ const Input = ({placeholder, name, type, value, handleChange}) => (
 
 const Welcome = () => {
     // Transfering data from context/PrenotationContext to components
-    const {connectWallet,currentAccount, formData, sendPrenotation, handleChange} = useContext(PrenotationContext);
+    const {connectWallet,currentAccount, formData, sendPrenotation, handleChange, isLoading} = useContext(PrenotationContext);
     
     const handleSubmit = (e) =>{
         // TODO: Non ho bisogno dell'addressTo perchè il formData raccoglie i dati per effettuare il rentOut di un posto 
@@ -102,7 +102,7 @@ const Welcome = () => {
                         <Input placeholder="Enter Description" name="description" type="text" handleChange={handleChange}/>
 
                         <div className="h-[1px] w-full bg-gray-400 my-2"/>
-                        {false ? (
+                        {isLoading ? (
                             <Loader/>
                         ): (
                             <button
