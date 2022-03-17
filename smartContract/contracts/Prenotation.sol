@@ -19,6 +19,10 @@ contract Prenotation {
     //Sequential unique placeId for every new Place
     uint256 public placeId;
 
+    function getPlaceId() public view returns(uint256){
+        return placeId;
+    }
+
     mapping(uint256 => Place) public places;
 
     struct Booking {
