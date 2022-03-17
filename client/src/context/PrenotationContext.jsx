@@ -31,29 +31,35 @@ export const PrenotationProvider = ({children}) => {
         setFormData((prevState) => ({...prevState, [name]: e.target.value}));
     };
 
+
+    const setInactive = async (placeId) => {
+        if(!ethereum) return alert("Please install MetaMask");
+        const prenotationContract = getEthereumContract();
+        prenotationContract.markPropertyAsInactive(placeId);
+    }
+
     //TODO: vedere se sto metodo funziona
     const fetchAllPlaces = async () => {
         try {
             if(!ethereum) return alert("Please install MetaMask");
             const prenotationContract = getEthereumContract();
-            console.log(prenotationContract)
-            const placeId = await prenotationContract.methods.placeId().call()
-            
+            const placeId = await prenotationContract.getPlaceId();
 
 
             //return object containing places object
             const places = [];
             for (var i = 0; i < placeId; i++) {
-                const place = await prenotationContract.methods.places(i).call();
+                const place = await prenotationContract.places(i);
                 places.push({
                     id: i,
-                    name: place.name,
+                    placeAddress: place.name,
                     description: place.description,
-                    price: parseInt(place.price._hex) / (10 ** 18)
+                    price: parseInt(place.price._hex) / (10 ** 18),
+                    owner: place.owner,
+                    isActive: place.isActive
                 })
             }
             setPlaces(places)
-
         } catch (error) {
             console.log(error);
             throw new Error("No ethereum object");
@@ -69,8 +75,7 @@ export const PrenotationProvider = ({children}) => {
             if(accounts.length){
                 setCurrentAccount(accounts[0]);
 
-                const fetchedPlaces = fetchAllPlaces();
-                console.log(fetchedPlaces)
+                fetchAllPlaces();
             } else{
                 console.log("No accounts found");
             }
@@ -95,28 +100,16 @@ export const PrenotationProvider = ({children}) => {
 
 
 
-    //TODO: Sistemare il metodo in modo corretto 
-    // Questo metodo dovrebbe essere l'equivalente di rentOutPlace di Prenotation.sol
-    const sendPrenotation = async () => {
+    //Method that puts on the blockchain a place
+    const  rentOutPlace = async () => {
         try {
             if(!ethereum) return alert("Please install MetaMask");
-            const {addressTo, amount, keyword, description} = formData;
+            const { amount, placeAddress, description } = formData;
             const prenotationContract = getEthereumContract();
-            const parsedAmount = ethers.utils.parseEthers(amount);
+            const parsedAmount = ethers.utils.parseEther(amount);
+            console.log(parsedAmount)
 
-
-            //send place to blockchain
-            await ethereum.request({
-                method: 'eth_sendTransaction',
-                params: [{
-                    from: currentAccount,
-                    to: addressTo,
-                    gas: '0x5208', //21000 GWEI
-                    value: parsedAmount._hex, //this need to be transformed in gwei or hexa
-                }]
-            });
-
-            const rentoOutHash = await prenotationContract.rentOutPlace(keyword, description, parsedAmount);
+            const rentoOutHash = await prenotationContract.rentOutplace(placeAddress, description, parsedAmount._hex);
 
             setIsLoading(true);
             console.log(`Loading - ${rentoOutHash.hash}`);
@@ -159,10 +152,12 @@ export const PrenotationProvider = ({children}) => {
             connectWallet,
             currentAccount,
             formData, 
-            sendPrenotation, 
+            rentOutPlace, 
             handleChange,
             places,
-            isLoading}}>
+            isLoading,
+            setInactive,
+            }}>
                 {children}
         </PrenotationContext.Provider>
     );

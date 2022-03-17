@@ -24,18 +24,17 @@ const Input = ({placeholder, name, type, value, handleChange}) => (
 
 const Welcome = () => {
     // Transfering data from context/PrenotationContext to components
-    const {connectWallet,currentAccount, formData, sendPrenotation, handleChange, isLoading} = useContext(PrenotationContext);
+    const {connectWallet,currentAccount, formData, rentOutPlace, handleChange, isLoading} = useContext(PrenotationContext);
     
     const handleSubmit = (e) =>{
-        // TODO: Non ho bisogno dell'addressTo perchè il formData raccoglie i dati per effettuare il rentOut di un posto 
-        const {addressTo, amount, keyword, description} = formData;
+        const { amount, placeAddress, description } = formData;
         
         //avoids to reload the page
         e.preventDefault();
 
-        if(!addressTo || !amount || !keyword || !description) return;
+        if ( !amount || !placeAddress || !description ) return;
 
-        sendPrenotation();
+        rentOutPlace();
     }
 
 
@@ -96,9 +95,9 @@ const Welcome = () => {
                     </div>
                     {/* TODO: Devo togliere l'address perchè questo campo serve per effettuare il rentOut di un posto */}
                     <div className="p-5 sm:w-96 w-full flex flex-col justify-start items-center blue-glassmorphism">
-                        <Input placeholder="Address To" name="addressTo" type="text" handleChange={handleChange}/>
+                        {/* <Input placeholder="Address To" name="addressTo" type="text" handleChange={handleChange}/> */}
                         <Input placeholder="Amount (ETH)" name="amount" type="number" handleChange={handleChange}/>
-                        <Input placeholder="Place Keywords" name="keyword" type="text" handleChange={handleChange}/>
+                        <Input placeholder="Place Address" name="placeAddress" type="text" handleChange={handleChange}/>
                         <Input placeholder="Enter Description" name="description" type="text" handleChange={handleChange}/>
 
                         <div className="h-[1px] w-full bg-gray-400 my-2"/>

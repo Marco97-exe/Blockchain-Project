@@ -1,4 +1,4 @@
 import abi from './Prenotation.json'
 
 export const contractABI = abi.abi
-export const contractAddress = '0x6e5997534C6e25591fA6dFF2fB89574178B6796a'
+export const contractAddress = '0x4678aBAF83b45D8d7a4efafec4A91300aAb6E5b9'
