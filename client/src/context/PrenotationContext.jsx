@@ -20,7 +20,7 @@ const getEthereumContract = () => {
 export const PrenotationProvider = ({children}) => {
 
     const [currentAccount, setCurrentAccount] = useState("");
-    //TODO: non ho bisogno dell'addressTo ma solo del prezzo a qui lo voglio fittare al giorno, il titolo (keyword) e la description (description)
+    //TODO: non ho bisogno dell'addressTo ma solo del prezzo a cui lo voglio fittare al giorno, il titolo (keyword) e la description (description)
     const [formData, setFormData] = useState({addressTo: "", amount:"", keyword:"", description:"" });
     const [isLoading, setIsLoading] = useState(false);
     const [places, setPlaces] = useState([])
@@ -31,28 +31,32 @@ export const PrenotationProvider = ({children}) => {
         setFormData((prevState) => ({...prevState, [name]: e.target.value}));
     };
 
-    //TODO: sistemare sto metodo
-    const getAllPlaces = async () => {
+    //TODO: vedere se sto metodo funziona
+    const fetchAllPlaces = async () => {
         try {
-            if (!ethereum) return alert("Please install MetaMask.");
+            if(!ethereum) return alert("Please install MetaMask");
             const prenotationContract = getEthereumContract();
-            //TODO: vedere se esiste nel prenotation.sol un metodo che restituisce i posti disponibili
-            const availablePlaces = await prenotationContract.getAllPlaces();
+            console.log(prenotationContract)
+            const placeId = await prenotationContract.methods.placeId().call()
+            
 
-            const structuredPlaces = availablePlaces.map((place) => ({
-                addressTo: place.receiver,
-                addressFrom: place.sender,
-                timestamo: new Date(place.timestamp.toNumber() * 1000).toLocaleString(),
-                message: place.message,
-                keyword: place.keyword,
-                amount: parseInt(place.amount._hex) / (10 ** 18)
-            }))
 
-            setPlaces(structuredPlaces);
-
+            //return object containing places object
+            const places = [];
+            for (var i = 0; i < placeId; i++) {
+                const place = await prenotationContract.methods.places(i).call();
+                places.push({
+                    id: i,
+                    name: place.name,
+                    description: place.description,
+                    price: parseInt(place.price._hex) / (10 ** 18)
+                })
+            }
+            setPlaces(places)
 
         } catch (error) {
-            
+            console.log(error);
+            throw new Error("No ethereum object");
         }
     }
 
@@ -65,7 +69,8 @@ export const PrenotationProvider = ({children}) => {
             if(accounts.length){
                 setCurrentAccount(accounts[0]);
 
-                getAllPlaces();
+                const fetchedPlaces = fetchAllPlaces();
+                console.log(fetchedPlaces)
             } else{
                 console.log("No accounts found");
             }
@@ -140,6 +145,8 @@ export const PrenotationProvider = ({children}) => {
             throw new Error("No ethereum object");
         }
     };
+
+    
 
     useEffect(() => {
         checkIfWalletConnected();
