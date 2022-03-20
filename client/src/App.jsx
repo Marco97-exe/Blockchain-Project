@@ -3,16 +3,16 @@ import { PrenotationProvider } from "./context/PrenotationContext";
 
 const App = () => {
   return (
-    <PrenotationProvider>
-      <div className="min-h-screen">
-        <div className="gradient-bg-welcome">
-          <Navbar />
-          <Welcome />
+      <PrenotationProvider>
+        <div className="min-h-screen">
+          <div className="gradient-bg-welcome">
+            <Navbar />
+            <Welcome />
+          </div>
+          <Services />
+          <Transactions />
+          <Footer />
         </div>
-        <Services />
-        <Transactions />
-        <Footer />
-      </div>
       </PrenotationProvider>
   );
 }

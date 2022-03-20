@@ -1,7 +1,6 @@
 import React, {useContext} from 'react';
-import {AiFillPlayCircle} from 'react-icons/ai';
 import {SiEthereum} from 'react-icons/si';
-import {BsHandbagFill, BsInfoCircle} from 'react-icons/bs';
+import { BsInfoCircle} from 'react-icons/bs';
 import  PrenotationContext  from '../context/PrenotationContext.jsx';
 import {Loader} from './';
 
@@ -9,7 +8,7 @@ import { shortenAddress } from '../utils/shortenAddress.js';
 
 const commonStyles = 'min-h-[70px] sm:px-0 px-2 sm:min-w-[120px] flex justify-center items-center border-[0.5px] border-gray-400 text-sm font-light text-white';
 
-const Input = ({placeholder, name, type, value, handleChange}) => (
+const PlaceInput = ({placeholder, name, type, value, handleChange}) => (
     <input 
         placeholder={placeholder}
         type={type}
@@ -19,12 +18,22 @@ const Input = ({placeholder, name, type, value, handleChange}) => (
         className="my-2 w-full rounded-sm p-2 outline-none bg-transparent text-white border-none text-sm white-glassmorphism"
     />
 );
+const PrenotationInput = ({placeholder, name, type, value, handleDate}) => (
+    <input 
+        placeholder={placeholder}
+        type={type}
+        step="1"
+        value = {value}
+        onChange={(e) => handleDate(e, name)}
+        className="my-2 w-full rounded-sm p-2 outline-none bg-transparent text-white border-none text-sm white-glassmorphism"
+    />
+);
 
 
 
 const Welcome = () => {
     // Transfering data from context/PrenotationContext to components
-    const {connectWallet,currentAccount, formData, rentOutPlace, handleChange, isLoading} = useContext(PrenotationContext);
+    const {connectWallet,currentAccount, formData, date, rentOutPlace, rentPlace, handleChange,handleDate, isLoadingOut, isLoading} = useContext(PrenotationContext);
     
     const handleSubmit = (e) =>{
         const { amount, placeAddress, description } = formData;
@@ -35,6 +44,16 @@ const Welcome = () => {
         if ( !amount || !placeAddress || !description ) return;
 
         rentOutPlace();
+    };
+
+    const handleSubmitPrenotation = (e) => {
+        const {placeId, startDay, endDay} = date;
+        e.preventDefault();
+
+        if(!placeId || !startDay || !endDay) return;
+        if(startDay > endDay) return;
+
+        rentPlace();
     }
 
 
@@ -57,22 +76,26 @@ const Welcome = () => {
                             <p className="text-white text-base font-semibold">Connect Wallet</p> 
                         </button>)
                     }
-                    <div className="grid sm:grid-cols-3 grid-cols-2 w-full mt-10">
-                        <div className={`rounded-tl-2xl ${commonStyles}`}>
-                        Reliability
+                    <br/>
+                    <br/>
+                    <br/>
+                    <div className="p-5 mt-7 mr-20 sm:w-96 w-full flex flex-col justify-between items-center blue-glassmorphism">
+                            <PrenotationInput placeholder="Insert place ID" name="placeId" type="number" handleDate={handleDate}/>
+                            <PrenotationInput placeholder="Starting day" name="startDay" type="number" handleDate={handleDate}/>
+                            <PrenotationInput placeholder="Ending Day" name="endDay" type="number" handleDate={handleDate}/>
+                            <div className="h-[1px] w-full bg-gray-400 my-2"/>
+                            {isLoading ? (
+                                <Loader/>
+                            ): (
+                                <button
+                                type="button"
+                                onClick={handleSubmitPrenotation}
+                                className="text-white w-full mt-2 border-[1px] p-2 border-[#3d4f7c] rounded-full cursor-pointer">
+                                    Rent Place
+
+                                </button>
+                            )}
                         </div>
-                        <div className={commonStyles}>Security</div>
-                        <div className={`sm:rounded-tr-2xl ${commonStyles}`}>
-                        Ethereum
-                        </div>
-                        <div className={`sm:rounded-bl-2xl ${commonStyles}`}>
-                        Web 3.0
-                        </div>
-                        <div className={commonStyles}>Low Fees</div>
-                        <div className={`rounded-br-2xl ${commonStyles}`}>
-                        Blockchain
-                        </div>
-                    </div>
                     </div>
                 <div className="flex flex-col flex-1 items-center justify-start w-full mf:mt-0 mt-10">
                     <div className="p-3 justify-end items-start flex-col rounded-xl h-40 sm:w-72 w-full my-5 eth-card black-glassmorphism">
@@ -93,27 +116,27 @@ const Welcome = () => {
                             </div>
                         </div>
                     </div>
-                    {/* TODO: Devo togliere l'address perchè questo campo serve per effettuare il rentOut di un posto */}
-                    <div className="p-5 sm:w-96 w-full flex flex-col justify-start items-center blue-glassmorphism">
-                        {/* <Input placeholder="Address To" name="addressTo" type="text" handleChange={handleChange}/> */}
-                        <Input placeholder="Amount (ETH)" name="amount" type="number" handleChange={handleChange}/>
-                        <Input placeholder="Place Address" name="placeAddress" type="text" handleChange={handleChange}/>
-                        <Input placeholder="Enter Description" name="description" type="text" handleChange={handleChange}/>
+                    
+                        
+                        <div className="p-5 sm:w-96 w-full flex flex-col justify-between items-center blue-glassmorphism">
+                            <PlaceInput placeholder="Amount (ETH)" name="amount" type="number" handleChange={handleChange}/>
+                            <PlaceInput placeholder="Place Address" name="placeAddress" type="text" handleChange={handleChange}/>
+                            <PlaceInput placeholder="Enter Description" name="description" type="text" handleChange={handleChange}/>
+                            <div className="h-[1px] w-full bg-gray-400 my-2"/>
+                            {isLoadingOut ? (
+                                <Loader/>
+                            ): (
+                                <button
+                                type="button"
+                                onClick={handleSubmit}
+                                className="text-white w-full mt-2 border-[1px] p-2 border-[#3d4f7c] rounded-full cursor-pointer">
+                                    Rent Out Place
 
-                        <div className="h-[1px] w-full bg-gray-400 my-2"/>
-                        {isLoading ? (
-                            <Loader/>
-                        ): (
-                            <button
-                            type="button"
-                            onClick={handleSubmit}
-                            className="text-white w-full mt-2 border-[1px] p-2 border-[#3d4f7c] rounded-full cursor-pointer">
-                                Rent Out Place
-
-                            </button>
-                        )}
-                    </div>
-
+                                </button>
+                            )}
+                        </div>
+                    
+                    
                 </div>
             </div>
         

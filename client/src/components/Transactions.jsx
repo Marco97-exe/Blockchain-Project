@@ -1,16 +1,18 @@
-import React, {useContext} from 'react';
+import React, {useContext, useState} from 'react';
 import  PrenotationContext  from '../context/PrenotationContext.jsx';
 import { shortenAddress } from '../utils/shortenAddress.js';
 
 const PlaceCard = ({id, placeAddress,description,price, owner, isActive}) => {
+  
   const {setInactive} = useContext(PrenotationContext);
 
+  //implementation of setting as inactive a place
   const handleInactive = (e) => {
     //avoids to reload the page
     e.preventDefault();
-    console.log(id)
     setInactive(id);
   }
+ 
   if(isActive){
     return (
       <div className="bg-[#181918] m-4 flex flex-1
@@ -56,6 +58,7 @@ const PlaceCard = ({id, placeAddress,description,price, owner, isActive}) => {
 
 const Transactions = () => {
     const {currentAccount, places} = useContext(PrenotationContext);
+    
     return (
         <div className="flex w-full justify-center items-center 2xl:px-20 gradient-bg-transactions">
             <div className="flex flex-col md:p-12 py-12 px-4">

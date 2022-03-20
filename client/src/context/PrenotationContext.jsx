@@ -20,10 +20,12 @@ const getEthereumContract = () => {
 export const PrenotationProvider = ({children}) => {
 
     const [currentAccount, setCurrentAccount] = useState("");
-    //TODO: non ho bisogno dell'addressTo ma solo del prezzo a cui lo voglio fittare al giorno, il titolo (keyword) e la description (description)
-    const [formData, setFormData] = useState({addressTo: "", amount:"", keyword:"", description:"" });
+    const [formData, setFormData] = useState({amount:0, placeAddress:"", description:"" });
+    const [date, setDate] = useState({placeId:0, startDay: 0, endDay:0});
+    const [isLoadingOut, setIsLoadingOut] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [places, setPlaces] = useState([])
+
+    const [places, setPlaces] = useState([]);
 
 
 
@@ -31,12 +33,17 @@ export const PrenotationProvider = ({children}) => {
         setFormData((prevState) => ({...prevState, [name]: e.target.value}));
     };
 
+    const handleDate = (e,name) => {
+        setDate((prevState) => ({...prevState, [name]: e.target.value}));
+    };
+    
+
 
     const setInactive = async (placeId) => {
         if(!ethereum) return alert("Please install MetaMask");
         const prenotationContract = getEthereumContract();
         prenotationContract.markPropertyAsInactive(placeId);
-    }
+    };
 
     //TODO: vedere se sto metodo funziona
     const fetchAllPlaces = async () => {
@@ -103,6 +110,7 @@ export const PrenotationProvider = ({children}) => {
     //Method that puts on the blockchain a place
     const  rentOutPlace = async () => {
         try {
+            
             if(!ethereum) return alert("Please install MetaMask");
             const { amount, placeAddress, description } = formData;
             const prenotationContract = getEthereumContract();
@@ -111,10 +119,10 @@ export const PrenotationProvider = ({children}) => {
 
             const rentoOutHash = await prenotationContract.rentOutplace(placeAddress, description, parsedAmount._hex);
 
-            setIsLoading(true);
+            setIsLoadingOut(true);
             console.log(`Loading - ${rentoOutHash.hash}`);
             await rentoOutHash.wait();
-            setIsLoading(false);
+            setIsLoadingOut(false);
             console.log(`Success - ${rentoOutHash.hash}`);
             
             
@@ -124,6 +132,27 @@ export const PrenotationProvider = ({children}) => {
             throw new Error("No ethereum object");
         }
     };
+
+    const rentPlace = async () => {
+        if(!ethereum) return alert("Please install MetaMask");
+        const prenotationContract = getEthereumContract();
+        const {placeId, startDay, endDay} = date;
+
+        const totalAmount = (places[placeId].price * (endDay - startDay)) * (10**18)
+        console.log(totalAmount)        
+        let overrides = {
+            from: currentAccount,
+            value: totalAmount
+        }
+
+        const rentHash = await prenotationContract.rentPlace(placeId, startDay, endDay, overrides)
+        alert('Property Booked Successfully');
+        setIsLoading(true);
+        console.log(`Loading - ${rentHash.hash}`);
+        await rentHash.wait();
+        setIsLoading(false);
+        console.log(`Success - ${rentHash.hash}`);
+    }
 
     const connectWallet = async () => {
         try {
@@ -151,10 +180,14 @@ export const PrenotationProvider = ({children}) => {
         value={{
             connectWallet,
             currentAccount,
-            formData, 
-            rentOutPlace, 
+            formData,
+            date, 
+            rentOutPlace,
+            rentPlace,
             handleChange,
+            handleDate,
             places,
+            isLoadingOut,
             isLoading,
             setInactive,
             }}>
