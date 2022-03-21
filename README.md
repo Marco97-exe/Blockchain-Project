@@ -1,8 +1,8 @@
 # Blockchain-Project
 
 Contains a decentralized Web-App that allows users to Rent or Rent Out a Place by giving some informations:
-- Renting Fase: In this case it is required to fill 3 camps respectively: Place ID, Starting Day of the rent and Ending Day;
-- Renting Out Fase: In this other case it is required to fill: Price per day (ETH), Place address and Place Description.
+- Renting phase: In this case it is required to fill 3 camps respectively: Place ID, Starting Day of the rent and Ending Day;
+- Renting Out phase: In this other case it is required to fill: Price per day (ETH), Place address and Place Description.
 
 It is also possible to **set as inactive** a place but only if connected with the address that preventively added a Place as available for renting.
 
