@@ -75,10 +75,8 @@ contract Prenotation {
         // Retrieve `place` object from the storage
         Place storage place = places[_placeId];
         // Assert that place is active
-        //TODO: could be done with modifiers ?
         require(place.isActive == true, "place with this ID is not active");
         // Assert that place is available for the dates
-        //TODO: implement in a way to avoid for loop ?
         for(uint256 i= checkInDate; i< checkOutDate; i++){
             if(place.isBooked[i] == true){
                 //if place is booked during one of the days, we need to revert transaction

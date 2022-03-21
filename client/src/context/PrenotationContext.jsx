@@ -45,7 +45,6 @@ export const PrenotationProvider = ({children}) => {
         prenotationContract.markPropertyAsInactive(placeId);
     };
 
-    //TODO: vedere se sto metodo funziona
     const fetchAllPlaces = async () => {
         try {
             if(!ethereum) return alert("Please install MetaMask");
@@ -83,6 +82,7 @@ export const PrenotationProvider = ({children}) => {
                 setCurrentAccount(accounts[0]);
 
                 fetchAllPlaces();
+                 
             } else{
                 console.log("No accounts found");
             }
@@ -91,20 +91,6 @@ export const PrenotationProvider = ({children}) => {
             console.log(error);
         }
     };
-
-    const checkIfPrenotationExist = async () => {
-        try {
-            const prenotationContract = getEthereumContract();
-            //TODO: devo vedere se ci sono stati delle operazioni di rentOut 
-            const rentOutPlacesCont = 3;
-            
-            window.localStorage.setItem("rentOutPlacesCont", rentOutPlacesCont)
-        } catch (error) {
-            throw new Error("No ethereum object");
-        }
-    }
-
-
 
 
     //Method that puts on the blockchain a place
@@ -172,7 +158,6 @@ export const PrenotationProvider = ({children}) => {
 
     useEffect(() => {
         checkIfWalletConnected();
-        checkIfPrenotationExist(); //TODO:vedere come gestire sta cosa del controllo se esistono posti dispoinibili
     },[]);
 
     return (
