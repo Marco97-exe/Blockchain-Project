@@ -101,7 +101,6 @@ export const PrenotationProvider = ({children}) => {
             const { amount, placeAddress, description } = formData;
             const prenotationContract = getEthereumContract();
             const parsedAmount = ethers.utils.parseEther(amount);
-            console.log(parsedAmount)
 
             const rentoOutHash = await prenotationContract.rentOutplace(placeAddress, description, parsedAmount._hex);
 
